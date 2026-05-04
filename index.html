@@ -633,6 +633,12 @@ function finishVerification(action){
   }, 2500);
 }
 
+function goStep2(){
+  document.getElementById("successModal").classList.remove("show");
+  document.getElementById("step2Modal").classList.add("show");
+}    
+    
+
 
 /* =========================
    RETRY SYSTEM (STEP FLOW)
